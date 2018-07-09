@@ -15,10 +15,23 @@ if __name__ == "__main__":
     print("Reading examples done!")
 
     # Init model
+    """
     dims = (X.shape[0],) + HPs.dims
     model = NNModel(dims, HPs.keepprobs, HPs.activates)
     (ws, bs) = XavierInitialization.init(dims)
     print("Creating model done!")
+    print(model.gd_checking(ws, bs, X, Y))
+    """
+    dims = (3,4,2)
+    model = NNModel(dims, (1, 1), (tanh, softmax) )
+    (ws, bs) = XavierInitialization.init(dims)
+    X = np.random.randn(3, 5)
+    Y = np.zeros((2, 5))
+    for i in range(0, 5):
+        choice = np.random.choice([0, 1])
+        Y[choice][i] = 1
+
+    print(model.gd_checking(ws, bs, X, Y))
     """
     # Train model
     print("Training model:")
