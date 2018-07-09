@@ -1,0 +1,6 @@
+asl_alphabet_train
+logs
+models
+__pycache__
+venv
+.idea
