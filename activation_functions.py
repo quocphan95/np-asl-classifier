@@ -15,7 +15,7 @@ class tanh:
 class sigmoid:
     @staticmethod
     def calculate(Z):
-        return 1 / (1 + np.exp(-Z))
+        return 1 / (1 + np.exp(Z))
 
     @staticmethod
     def derivative(Z):
@@ -38,3 +38,12 @@ class linear:
     @staticmethod
     def derivative(Z):
         return 1
+
+class relu:
+    @staticmethod
+    def calculate(Z):
+        return (Z >= 0) * Z
+
+    @staticmethod
+    def derivative(Z):
+        return (Z > 0) * 1

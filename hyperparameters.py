@@ -12,8 +12,8 @@ class HyperParameters:
         "Z", "del", "nothing", "space"
     )
     m = 64
-    dims = (50, 50, len(classes))
+    dims = (60, 50, len(classes))
     keepprobs = (1.0, 1.0, 1.0)
-    activates = (tanh, tanh, softmax)
+    activates = (relu, relu, softmax)
     learning_rate = 0.1
-    numiter = 100
+    numiter = 1000
