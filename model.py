@@ -50,22 +50,23 @@ class NNModel:
         return dws, dbs
 
     # optimize the model
-    def fit(self, ws, bs, X, Y, numiter=1, learning_rate=0.001):
+    def fit(self, ws, bs, X, Y, numiter=1, learning_rate=0.001, callback=lambda iter, cost: cost):
         i = 0
+        costs = []
 
         while i < numiter:
-            (cost, cache) = self.forward_probagation(ws, bs, X, Y)
+            (_, cache) = self.forward_probagation(ws, bs, X, Y)
             (dW, db) = self.backward_propagation(ws, X, Y, cache)
 
             for j in range(0, len(ws)):
                 ws[j] = ws[j] - learning_rate * dW[j]
                 bs[j] = bs[j] - learning_rate * db[j]
 
+            (cost, _) = self.forward_probagation(ws, bs, X, Y)
+            costs = costs + [callback(i, cost)]
             i = i + 1
 
-        (cost, _) = self.forward_probagation(ws, bs, X, Y)
-
-        return cost
+        return costs
 
     def gd_checking(self, ws, bs, X, Y):
 

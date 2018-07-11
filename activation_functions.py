@@ -29,6 +29,13 @@ class softmax:
         t = np.exp(Z)
         return t / t.sum(axis=0, keepdims=True)
 
+class stable_softmax:
+    @staticmethod
+    def calculate(Z):
+        maxz = np.max(Z, axis=0, keepdims=True)
+        t = np.exp(Z - maxz)
+        return t / t.sum(axis=0, keepdims=True)
+
 
 class linear:
     @staticmethod
@@ -42,8 +49,8 @@ class linear:
 class relu:
     @staticmethod
     def calculate(Z):
-        return (Z >= 0) * Z
+        return np.maximum(Z, 0)
 
     @staticmethod
     def derivative(Z):
-        return (Z > 0) * 1
+        return (Z > 0).astype(int)

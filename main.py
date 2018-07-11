@@ -2,6 +2,7 @@ from init import *
 from input import *
 from model import *
 from hyperparameters import HyperParameters as HPs
+from checker import *
 
 if __name__ == "__main__":
     np.random.seed(1)
@@ -14,7 +15,7 @@ if __name__ == "__main__":
     Y_test = Y[:, train_index:-1]
     print("Reading examples done!")
 
-    # Init model
+    # Create model
     dims = (X.shape[0],) + HPs.dims
     model = NNModel(dims, HPs.keepprobs, HPs.activates)
     (ws, bs) = HeInitialization.init(dims)
@@ -22,26 +23,22 @@ if __name__ == "__main__":
 
     # Train model
     print("Training model:")
-    J_trains = []
-    J_tests = []
-    J_train = 0
-    J_test = 0
 
-    for i in range(0, HPs.numiter):
-        J_train = model.fit(ws, bs, X_train, Y_train, 1, HPs.learning_rate)
-        (J_test, _) = model.forward_probagation(ws, bs, X_test, Y_test, test = True)
-        J_trains = J_trains + [J_train]
-        J_tests = J_tests + [J_test]
+    def train_callback(iter, cost):
+        if iter % 10 == 0:
+            print("iteration", ("{0:>6}").format(str(iter)), ", cost =", cost)
+        return cost
 
-        if i % 100 == 0:
-            print("iteration", i, ", cost =", J_train)
+    J_trains = model.fit(ws, bs, X_train, Y_train, HPs.numiter, HPs.learning_rate, train_callback)
+    (J_test, _) = model.forward_probagation(ws, bs, X_test, Y_test, True)
 
-    print("Finish training model, J_train = ", J_train)
-    print("Finish training model, J_test = ", J_test)
+    print("Finish training model, J_train = ", J_trains[-1])
+    print("Train: ", Checker.check(ws, bs, X_train, Y_train, model))
+    print("Test : ", Checker.check(ws, bs, X_test, Y_test, model))
 
     # draw chart
     plt.xlabel("Iterations")
     plt.ylabel("Cost function")
-    iters = np.array(range(0, HPs.numiter)).reshape(-1, 1)
-    plt.plot(iters, np.array(J_trains).reshape(-1, 1), "b-", iters, np.array(J_tests).reshape(-1, 1), "r-")
+    iters = np.array(range(HPs.numiter)).reshape(-1, 1)
+    plt.plot(iters, np.array(J_trains).reshape(-1, 1), "b-")
     plt.show()
