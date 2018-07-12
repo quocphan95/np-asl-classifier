@@ -3,11 +3,12 @@ from input import *
 from model import *
 from hyperparameters import HyperParameters as HPs
 from checker import *
+import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
     np.random.seed(1)
     # Read data
-    (X, Y) = ImageInput.getbatch(0, HPs.m, HPs.classes, HPs.experclass)
+    (X, Y) = ImageInput.get_training_set(HPs.m, HPs.classes, HPs.experclass)
     train_index = int(HPs.m * 0.8)
     X_train = X[:, 0:train_index]
     Y_train = Y[:, 0:train_index]
@@ -17,7 +18,7 @@ if __name__ == "__main__":
 
     # Create model
     dims = (X.shape[0],) + HPs.dims
-    model = NNModel(dims, HPs.keepprobs, HPs.activates)
+    model = NNModel(dims, HPs)
     (ws, bs) = HeInitialization.init(dims)
     print("Creating model done!")
 
@@ -29,7 +30,7 @@ if __name__ == "__main__":
             print("iteration", ("{0:>6}").format(str(iter)), ", cost =", cost)
         return cost
 
-    J_trains = model.fit(ws, bs, X_train, Y_train, HPs.numiter, HPs.learning_rate, train_callback)
+    J_trains = model.fit(ws, bs, X_train, Y_train, train_callback)
     (J_test, _) = model.forward_probagation(ws, bs, X_test, Y_test, True)
 
     print("Finish training model, J_train = ", J_trains[-1])

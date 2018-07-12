@@ -11,9 +11,13 @@ class HyperParameters:
         "U", "V", "W", "X", "Y",
         "Z", "del", "nothing", "space"
     )
-    m = 64
-    dims = (80, 80, 40, 40, 40, len(classes))
-    keepprobs = (1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
-    activates = (tanh, tanh, tanh, tanh, tanh, softmax)
+    m = 2048
+    dims = (160, 160, 160, 160, 160, 80, 80, 80, len(classes))
+    keepprobs = (1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
+    activates = (tanh, tanh, tanh, tanh, tanh, tanh, tanh, tanh, softmax)
     learning_rate = 0.05
-    numiter = 10
+    beta1 = 0.9  # momentum beta
+    beta2 = 0.99
+    eps = 10e-8
+    numiter = 500
+    imagesize = 32, 32

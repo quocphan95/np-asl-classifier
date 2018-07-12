@@ -3,10 +3,15 @@ from activation_functions import *
 
 class NNModel:
 
-    def __init__(self, dims, keepprobs, activates):
+    def __init__(self, dims, HPs):
         self._dims = dims
-        self._keepprobs = keepprobs
-        self._activate = activates
+        self._keepprobs = HPs.keepprobs
+        self._activate = HPs.activates
+        self._learning_rate = HPs.learning_rate
+        self._beta1 = HPs.beta1
+        self._beta2 = HPs.beta2
+        self._eps = HPs.eps
+        self._numiter = HPs.numiter
 
     def forward_probagation(self, ws, bs, X, Y, test = False):
         Z = []
@@ -50,17 +55,33 @@ class NNModel:
         return dws, dbs
 
     # optimize the model
-    def fit(self, ws, bs, X, Y, numiter=1, learning_rate=0.001, callback=lambda iter, cost: cost):
+    def fit(self, ws, bs, X, Y, callback=lambda iter, cost: cost):
         i = 0
         costs = []
+        #vdws = []
+        #vdbs = []
+        #sdws = []
+        #sdbs = []
 
-        while i < numiter:
+        #for j in range(0, len(ws)):
+            #vdws = vdws + [np.zeros(ws[j].shape)]
+            #vdbs = vdbs + [np.zeros(bs[j].shape)]
+            #sdws = sdws + [np.zeros(ws[j].shape)]
+            #sdbs = sdbs + [np.zeros(bs[j].shape)]
+
+        while i < self._numiter:
             (_, cache) = self.forward_probagation(ws, bs, X, Y)
-            (dW, db) = self.backward_propagation(ws, X, Y, cache)
+            (dws, dbs) = self.backward_propagation(ws, X, Y, cache)
 
             for j in range(0, len(ws)):
-                ws[j] = ws[j] - learning_rate * dW[j]
-                bs[j] = bs[j] - learning_rate * db[j]
+                #vdws[j] = self._beta1 * vdws[j] + (1 - self._beta1) * dws[j]
+                #vdbs[j] = self._beta1 * vdbs[j] + (1 - self._beta1) * dbs[j]
+                #sdws[j] = beta2 * sdws[j] + (1 - beta2) * np.square(dws[j])
+                #sdbs[j] = beta2 * sdbs[j] + (1 - beta2) * np.square(dbs[j])
+                #ws[j] = ws[j] - self._learning_rate * dws[j]
+                #bs[j] = bs[j] - self._learning_rate * dbs[j]
+                ws[j] = ws[j] - self._learning_rate * dws[j]
+                bs[j] = bs[j] - self._learning_rate * dbs[j]
 
             (cost, _) = self.forward_probagation(ws, bs, X, Y)
             costs = costs + [callback(i, cost)]
