@@ -11,7 +11,8 @@ class NNModel:
         self._beta1 = HPs.beta1
         self._beta2 = HPs.beta2
         self._eps = HPs.eps
-        self._numiter = HPs.numiter
+        self._numiter = HPs.numiter  # number of epoch
+        self._batchsize = HPs.batch_size
 
     def forward_probagation(self, ws, bs, X, Y, test = False):
         Z = []
@@ -54,38 +55,61 @@ class NNModel:
 
         return dws, dbs
 
-    # optimize the model
-    def fit(self, ws, bs, X, Y, callback=lambda iter, cost: cost):
-        i = 0
+    # optimize the model by using mini-batch GD
+    def fit_mini_batch(self, ws, bs, X, Y, callback=lambda epoch, i, cost: cost):
         costs = []
-        #vdws = []
-        #vdbs = []
-        #sdws = []
-        #sdbs = []
+        vdws = []
+        vdbs = []
+        sdws = []
+        sdbs = []
 
-        #for j in range(0, len(ws)):
-            #vdws = vdws + [np.zeros(ws[j].shape)]
-            #vdbs = vdbs + [np.zeros(bs[j].shape)]
-            #sdws = sdws + [np.zeros(ws[j].shape)]
-            #sdbs = sdbs + [np.zeros(bs[j].shape)]
+        for j in range(len(ws)):
+            vdws = vdws + [np.zeros(ws[j].shape)]
+            vdbs = vdbs + [np.zeros(bs[j].shape)]
+            sdws = sdws + [np.zeros(ws[j].shape)]
+            sdbs = sdbs + [np.zeros(bs[j].shape)]
+        iter_per_epoch = int(X.shape[1] / self._batchsize)
 
-        while i < self._numiter:
+        for epoch in range(self._numiter):
+
+            for iter in range(iter_per_epoch):
+                begin_index = iter * self._batchsize
+                X_mini = X[:, begin_index: (begin_index + self._batchsize)].reshape(-1, self._batchsize)
+                Y_mini = Y[:, begin_index: (begin_index + self._batchsize)].reshape(-1, self._batchsize)
+                (_, cache) = self.forward_probagation(ws, bs, X_mini, Y_mini)
+                (dws, dbs) = self.backward_propagation(ws, X_mini, Y_mini, cache)
+
+                for i in range(len(ws)):
+                    vdws[i] = self._beta1 * vdws[i] + (1 - self._beta1) * dws[i]
+                    vdbs[i] = self._beta1 * vdbs[i] + (1 - self._beta1) * dbs[i]
+                    sdws[i] = self._beta2 * sdws[i] + (1 - self._beta2) * np.square(dws[i])
+                    sdbs[i] = self._beta2 * sdbs[i] + (1 - self._beta2) * np.square(dbs[i])
+                    #ws[i] = ws[i] - self._learning_rate * vdws[i]
+                    #bs[i] = bs[i] - self._learning_rate * vdbs[i]
+                    #ws[i] = ws[i] - self._learning_rate * dws[i] / (np.sqrt(sdws[i]) + self._eps)
+                    #bs[i] = bs[i] - self._learning_rate * dbs[i] / (np.sqrt(sdbs[i]) + self._eps)
+                    ws[i] = ws[i] - self._learning_rate * dws[i]
+                    bs[i] = bs[i] - self._learning_rate * dbs[i]
+
+                (cost, _) = self.forward_probagation(ws, bs, X, Y)
+                costs = costs + [callback(epoch, iter, cost)]
+
+        return costs
+
+    # optimize the model
+    def fit(self, ws, bs, X, Y, callback=lambda epoch, cost: cost):
+        costs = []
+
+        for epoch in range(self._numiter):
             (_, cache) = self.forward_probagation(ws, bs, X, Y)
             (dws, dbs) = self.backward_propagation(ws, X, Y, cache)
 
-            for j in range(0, len(ws)):
-                #vdws[j] = self._beta1 * vdws[j] + (1 - self._beta1) * dws[j]
-                #vdbs[j] = self._beta1 * vdbs[j] + (1 - self._beta1) * dbs[j]
-                #sdws[j] = beta2 * sdws[j] + (1 - beta2) * np.square(dws[j])
-                #sdbs[j] = beta2 * sdbs[j] + (1 - beta2) * np.square(dbs[j])
-                #ws[j] = ws[j] - self._learning_rate * dws[j]
-                #bs[j] = bs[j] - self._learning_rate * dbs[j]
-                ws[j] = ws[j] - self._learning_rate * dws[j]
-                bs[j] = bs[j] - self._learning_rate * dbs[j]
+            for i in range(len(ws)):
+                ws[i] = ws[i] - self._learning_rate * dws[i]
+                bs[i] = bs[i] - self._learning_rate * dbs[i]
 
             (cost, _) = self.forward_probagation(ws, bs, X, Y)
-            costs = costs + [callback(i, cost)]
-            i = i + 1
+            costs = costs + [callback(epoch, cost)]
 
         return costs
 

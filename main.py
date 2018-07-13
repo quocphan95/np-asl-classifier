@@ -25,21 +25,25 @@ if __name__ == "__main__":
     # Train model
     print("Training model:")
 
-    def train_callback(iter, cost):
-        if iter % 10 == 0:
-            print("iteration", ("{0:>6}").format(str(iter)), ", cost =", cost)
+    def train_mini_callback(epoch, iter, cost):
+        print("epoch", ("{0:>6}").format(str(epoch)), ", iteration ", ("{0:>6}").format(str(iter)), ", cost =", cost)
         return cost
 
-    J_trains = model.fit(ws, bs, X_train, Y_train, train_callback)
+    def train_callback(epoch, cost):
+        if epoch % 10 == 0:
+            print("epoch", ("{0:>6}").format(str(epoch)), ", cost =", cost)
+        return cost
+
+    J_trains = model.fit_mini_batch(ws, bs, X_train, Y_train, train_mini_callback)
     (J_test, _) = model.forward_probagation(ws, bs, X_test, Y_test, True)
 
     print("Finish training model, J_train = ", J_trains[-1])
+    print("Finish training model, J_test  = ", J_test)
     print("Train: ", Checker.check(ws, bs, X_train, Y_train, model))
     print("Test : ", Checker.check(ws, bs, X_test, Y_test, model))
 
     # draw chart
     plt.xlabel("Iterations")
     plt.ylabel("Cost function")
-    iters = np.array(range(HPs.numiter)).reshape(-1, 1)
-    plt.plot(iters, np.array(J_trains).reshape(-1, 1), "b-")
+    plt.plot(np.arange(0, len(J_trains), 1), np.array(J_trains).reshape(-1, 1), "b-")
     plt.show()
