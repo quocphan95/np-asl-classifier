@@ -84,10 +84,10 @@ class NNModel:
                     vdbs[i] = self._beta1 * vdbs[i] + (1 - self._beta1) * dbs[i]
                     sdws[i] = self._beta2 * sdws[i] + (1 - self._beta2) * np.square(dws[i])
                     sdbs[i] = self._beta2 * sdbs[i] + (1 - self._beta2) * np.square(dbs[i])
-                    ws[i] = ws[i] - self._learning_rate * vdws[i]
-                    bs[i] = bs[i] - self._learning_rate * vdbs[i]
-                    #ws[i] = ws[i] - self._learning_rate * dws[i] / (np.sqrt(sdws[i]) + self._eps)
-                    #bs[i] = bs[i] - self._learning_rate * dbs[i] / (np.sqrt(sdbs[i]) + self._eps)
+                    #ws[i] = ws[i] - self._learning_rate * vdws[i]
+                    #bs[i] = bs[i] - self._learning_rate * vdbs[i]
+                    ws[i] = ws[i] - self._learning_rate * dws[i] / np.sqrt(sdws[i] + self._eps)
+                    bs[i] = bs[i] - self._learning_rate * dbs[i] / np.sqrt(sdbs[i] + self._eps)
                     #ws[i] = ws[i] - self._learning_rate * dws[i]
                     #bs[i] = bs[i] - self._learning_rate * dbs[i]
 
