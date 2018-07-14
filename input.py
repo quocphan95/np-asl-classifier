@@ -32,3 +32,12 @@ class ImageInput():
             ex_class = ex_class % num_of_classes
 
         return X, Y
+
+    @staticmethod
+    def get_training_example(example_path, classes, class_label):
+        num_of_classes = len(classes)
+        img = cv2.imread(example_path)
+        x = Preprocessor.preprocess(img).reshape(-1, 1)
+        y = np.zeros((num_of_classes, 1))
+        y[classes.index(class_label):1] = 1
+        return x, y

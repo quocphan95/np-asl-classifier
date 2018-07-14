@@ -60,14 +60,11 @@ class NNModel:
         costs = []
         vdws = []
         vdbs = []
-        sdws = []
-        sdbs = []
 
         for j in range(len(ws)):
             vdws = vdws + [np.zeros(ws[j].shape)]
             vdbs = vdbs + [np.zeros(bs[j].shape)]
-            sdws = sdws + [np.zeros(ws[j].shape)]
-            sdbs = sdbs + [np.zeros(bs[j].shape)]
+
         iter_per_epoch = int(X.shape[1] / self._batchsize)
 
         for epoch in range(self._numiter):
@@ -82,14 +79,8 @@ class NNModel:
                 for i in range(len(ws)):
                     vdws[i] = self._beta1 * vdws[i] + (1 - self._beta1) * dws[i]
                     vdbs[i] = self._beta1 * vdbs[i] + (1 - self._beta1) * dbs[i]
-                    sdws[i] = self._beta2 * sdws[i] + (1 - self._beta2) * np.square(dws[i])
-                    sdbs[i] = self._beta2 * sdbs[i] + (1 - self._beta2) * np.square(dbs[i])
-                    ws[i] = ws[i] - self._learning_rate * vdws[i] / np.sqrt(sdws[i] + self._eps)
-                    bs[i] = bs[i] - self._learning_rate * vdbs[i] / np.sqrt(sdbs[i] + self._eps)
-                    #ws[i] = ws[i] - self._learning_rate * dws[i] / np.sqrt(sdws[i] + self._eps)
-                    #bs[i] = bs[i] - self._learning_rate * dbs[i] / np.sqrt(sdbs[i] + self._eps)
-                    #ws[i] = ws[i] - self._learning_rate * dws[i]
-                    #bs[i] = bs[i] - self._learning_rate * dbs[i]
+                    ws[i] = ws[i] - self._learning_rate * vdws[i]
+                    bs[i] = bs[i] - self._learning_rate * vdbs[i]
 
                 (cost, _) = self.forward_probagation(ws, bs, X, Y)
                 costs = costs + [callback(epoch, iter, cost)]
