@@ -13,12 +13,12 @@ class HyperParameters:
     m = 2560
     batch_size = 64
 
-    dims = (160, 160, 160, 160, 80, 80, 80, 80, len(classes))
-    keepprobs = (1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
-    activates = (tanh, tanh, tanh, tanh, tanh, tanh, tanh, tanh, softmax)
-    learning_rate = 0.001
+    dims = (160, 160, 160, 160, 160, 160, 160, 160, 80, 80, 80, 80, 80, 80, 80, 80, len(classes))
+    keepprobs = (1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
+    activates = (tanh, tanh, tanh, tanh, tanh, tanh, tanh, tanh, tanh, tanh, tanh, tanh, tanh, tanh, tanh, tanh,softmax)
+    learning_rate = 0.0005
     beta1 = 0.9  # momentum beta
     beta2 = 0.9
     eps = 10e-8
-    numiter = 100
+    numiter = 200
     imagesize = 32, 32
