@@ -60,31 +60,44 @@ class NNModel:
         costs = []
         vdws = []
         vdbs = []
+        lr = self._learning_rate
 
         for j in range(len(ws)):
             vdws = vdws + [np.zeros(ws[j].shape)]
             vdbs = vdbs + [np.zeros(bs[j].shape)]
 
         iter_per_epoch = int(X.shape[1] / self._batchsize)
+        begin_epoch = 0
+        halt = False
 
-        for epoch in range(self._numiter):
+        while not halt:
+            try:
+                for epoch in range(begin_epoch, self._numiter):
+                    begin_epoch = epoch
+                    for iter in range(iter_per_epoch):
+                        begin_index = iter * self._batchsize
+                        X_mini = X[:, begin_index: (begin_index + self._batchsize)].reshape(-1, self._batchsize)
+                        Y_mini = Y[:, begin_index: (begin_index + self._batchsize)].reshape(-1, self._batchsize)
+                        (_, cache) = self.forward_probagation(ws, bs, X_mini, Y_mini)
+                        (dws, dbs) = self.backward_propagation(ws, X_mini, Y_mini, cache)
 
-            for iter in range(iter_per_epoch):
-                begin_index = iter * self._batchsize
-                X_mini = X[:, begin_index: (begin_index + self._batchsize)].reshape(-1, self._batchsize)
-                Y_mini = Y[:, begin_index: (begin_index + self._batchsize)].reshape(-1, self._batchsize)
-                (_, cache) = self.forward_probagation(ws, bs, X_mini, Y_mini)
-                (dws, dbs) = self.backward_propagation(ws, X_mini, Y_mini, cache)
+                        for i in range(len(ws)):
+                            vdws[i] = self._beta1 * vdws[i] + (1 - self._beta1) * dws[i]
+                            vdbs[i] = self._beta1 * vdbs[i] + (1 - self._beta1) * dbs[i]
+                            ws[i] = ws[i] - lr * vdws[i]
+                            bs[i] = bs[i] - lr * vdbs[i]
 
-                for i in range(len(ws)):
-                    vdws[i] = self._beta1 * vdws[i] + (1 - self._beta1) * dws[i]
-                    vdbs[i] = self._beta1 * vdbs[i] + (1 - self._beta1) * dbs[i]
-                    ws[i] = ws[i] - self._learning_rate * vdws[i]
-                    bs[i] = bs[i] - self._learning_rate * vdbs[i]
+                        (cost, _) = self.forward_probagation(ws, bs, X, Y)
+                        costs = costs + [callback(epoch, iter, cost)]
+            except KeyboardInterrupt:
+                command = input(">")
 
-                (cost, _) = self.forward_probagation(ws, bs, X, Y)
-                costs = costs + [callback(epoch, iter, cost)]
-
+                if command == "halt":
+                    halt = True
+                    missed_costs = costs[-1] * (self._numiter - len(costs))
+                    costs = costs + missed_costs
+                elif command == "alpha":
+                    lr = float(input("alpha: "))
         return costs
 
     # optimize the model

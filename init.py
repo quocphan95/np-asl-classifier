@@ -1,4 +1,6 @@
 import numpy as np
+import pickle as pk
+import os.path as path
 
 
 class HeInitialization:
@@ -31,3 +33,14 @@ class XavierInitialization:
             bs = bs + [b]
 
         return ws, bs
+
+
+# Read the matrixes from file and set them as initial parameter
+class PresetInitialization:
+
+    @staticmethod
+    def init(pkl_name):
+        pkl_name = path.join("models", pkl_name)
+        f = open(pkl_name, "rb")
+        return pk.load(f)
+

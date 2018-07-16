@@ -23,7 +23,8 @@ if __name__ == "__main__":
     # Create model
     dims = (X.shape[0],) + HPs.dims
     model = NNModel(dims, HPs)
-    (ws, bs) = HeInitialization.init(dims)
+    # (ws, bs) = HeInitialization.init(dims)
+    (ws, bs) = PresetInitialization.init("2018_7_16_11_30_14.pkl")
     print("Creating model done!")
 
     # Train model
