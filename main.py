@@ -24,19 +24,19 @@ if __name__ == "__main__":
     dims = (X.shape[0],) + HPs.dims
     model = NNModel(dims, HPs)
     # (ws, bs) = HeInitialization.init(dims)
-    (ws, bs) = PresetInitialization.init("2018_7_16_11_30_14.pkl")
+    (ws, bs) = PresetInitialization.init("2018_7_16_13_33_39.pkl")
     print("Creating model done!")
 
     # Train model
     print("Training model:")
 
     def train_mini_callback(epoch, iter, cost):
-        print("epoch", ("{0:>6}").format(str(epoch)), ", iteration ", ("{0:>6}").format(str(iter)), ", cost =", cost)
-        return cost
+        print("epoch {epoch:>6}, iteration {iter:>6}, cost = {cost:>20.10}".format(**locals()))
+        return None
 
     def train_callback(epoch, cost):
         if epoch % 10 == 0:
-            print("epoch", ("{0:>6}").format(str(epoch)), ", cost =", cost)
+            print("epoch {epoch:>6}, cost = {cost:>20.10}".format(**locals()))
         return cost
 
     J_trains = model.fit_mini_batch(ws, bs, X_train, Y_train, train_mini_callback)
@@ -54,7 +54,7 @@ if __name__ == "__main__":
     plt.show()
 
     now = datetime.datetime.now()
-    name = "{0}_{1}_{2}_{3}_{4}_{5}.pkl".format(now.year, now.month, now.day, now.hour, now.minute, now.second)
+    name = "{0.year}_{0.month}_{0.day}_{0.hour}_{0.minute}_{0.second}.pkl".format(now)
 
     f = open(path.join("models", name), "wb")
     pk.dump((ws, bs), f)

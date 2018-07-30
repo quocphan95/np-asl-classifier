@@ -10,7 +10,7 @@ class HyperParameters:
         "P", "Q", "R", "S", "T",
         "U", "V", "W", "X", "Y",
         "Z", "del", "nothing", "space")
-    m = 2560
+    m = 256
     batch_size = 64
 
     dims = (160, 160, 160, 160, 160, 160, 160, 160, 80, 80, 80, 80, 80, 80, 80, 80, len(classes))
@@ -20,5 +20,5 @@ class HyperParameters:
     beta1 = 0.9  # momentum beta
     beta2 = 0.9
     eps = 10e-8
-    numiter = 200
+    numiter = 10
     imagesize = 32, 32

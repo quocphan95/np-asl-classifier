@@ -57,6 +57,24 @@ class NNModel:
 
     # optimize the model by using mini-batch GD
     def fit_mini_batch(self, ws, bs, X, Y, callback=lambda epoch, i, cost: cost):
+
+        def get_float(message, default_value):
+            float_number = None
+
+            while not float_number:
+                try:
+                    line = input(message)
+
+                    if not line:
+                        float_number = default_value
+                    else:
+                        float_number = float(line)
+
+                except ValueError:
+                    print("Invailid float number, enter again")
+
+            return float_number
+
         costs = []
         vdws = []
         vdbs = []
@@ -88,16 +106,16 @@ class NNModel:
                             bs[i] = bs[i] - lr * vdbs[i]
 
                         (cost, _) = self.forward_probagation(ws, bs, X, Y)
-                        costs = costs + [callback(epoch, iter, cost)]
+                        costs = costs + [cost]
+                        callback(epoch, iter, cost)
+                else:
+                    halt = True
             except KeyboardInterrupt:
-                command = input(">")
-
+                command = input("\n>")
                 if command == "halt":
                     halt = True
-                    missed_costs = costs[-1] * (self._numiter - len(costs))
-                    costs = costs + missed_costs
                 elif command == "alpha":
-                    lr = float(input("alpha: "))
+                    lr = get_float("learning rate alpha ({0}):".format(lr), lr)
         return costs
 
     # optimize the model
